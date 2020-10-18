@@ -7,7 +7,7 @@ Source code from my lecture: TODO
 java -Xms80G -Xmx80G HelloWorld
 java -Xms2G -Xmx2G -XX:+AlwaysPreTouch HelloWorld
 java -XX:+UnlockExperimentalVMOptions -Xms2G -Xmx2G -XX:+AlwaysPreTouch -XX:+UseZGC HelloWorld
-smem -c "pid command rss pss" -ak -P "Hello"
+clear; smem -c "pid command rss pss" -ak -P "Hello"
 ```
 
 ### Heap
@@ -28,28 +28,29 @@ jcmd `pgrep -f HelloWorld` VM.class_hierarchy
 jcmd `pgrep -f HelloWorld` VM.classloaders
 jcmd `pgrep -f HelloWorld` VM.classloader_stats
 java -Xlog:class+unload,class+load=info Classes
-java -agentpath:/opt/profiler/build/libasyncProfiler.so=start,file=/tmp/prof.svg,event=java.lang.ClassLoader.loadClass Classes
+java -agentpath:/opt/profiler/build/libasyncProfiler.so=start,file=/tmp/prof.svg,event=jdk.internal.misc.Unsafe.defineClass Classes
 ```
 
 ### JIT
 ```shell script
 java -Xlog:codecache+sweep*=trace,jit+compilation=debug HelloWorld
 jcmd `pgrep -f HelloWorld` Compiler.codelist
+jcmd `pgrep -f HelloWorld` Compiler.CodeHeap_Analytics
 ```
 
 ### Threads
 ```shell script
 jcmd `pgrep -f HelloWorld` Thread.print
-java -Xms1G -Xmx1G -XX:+AlwaysPreTouch -XX:NativeMemoryTracking=summary ThreadMemoryConsume
-smem -c "pid command rss pss" -ak -P "ThreadMemoryConsume"
+java -Xms1G -Xmx1G -XX:+AlwaysPreTouch ThreadMemoryConsume
+jcmd `pgrep -f ThreadMemoryConsume` Thread.print
+clear; smem -c "pid command rss pss" -ak -P "ThreadMemoryConsume"
 ```
 
 ### NMT
 ```shell script
-jcmd `pgrep -f ThreadMemoryConsume` VM.native_memory scale=MB
 jcmd `pgrep -f HelloWorld` Thread.print | grep tid | wc -l
 java -XX:NativeMemoryTracking=summary HelloWorld
-jcmd  `pgrep -f HelloWorld` VM.native_memory``
+jcmd  `pgrep -f HelloWorld` VM.native_memory
 ```
 
 ### GC
@@ -57,7 +58,7 @@ jcmd  `pgrep -f HelloWorld` VM.native_memory``
 java -Xms2G -Xmx2G -XX:+AlwaysPreTouch -XX:+UseConcMarkSweepGC -XX:NativeMemoryTracking=summary GCMem
 java -Xms2G -Xmx2G -XX:+AlwaysPreTouch -XX:+UseG1GC -XX:NativeMemoryTracking=summary GCMem
 ps aux | grep GCMem
-jcmd <pid> VM.native_memory
+jcmd <pid> VM.native_memory scale=MB
 ```
 
 ### String table
@@ -75,21 +76,21 @@ java -XX:ParallelGCThreads=2 -Xlog:gc,gc+phases=debug -cp ".:commons-lang3-3.9.j
 ```shell script
 java -Xms1G -Xmx1G -XX:+AlwaysPreTouch -XX:NativeMemoryTracking=summary FileChannelExample
 jcmd `pgrep -f FileChannelExample` VM.native_memory scale=MB
-smem -c "pid command rss pss" -ak -P "FileChannelExample"
+clear; smem -c "pid command rss pss" -ak -P "FileChannelExample"
 pmap -x `pgrep -f FileChannelExample`
 ```
 
 ### Malloc
 ```shell script
 java -Xmx500M -XX:MaxDirectMemorySize=4G -XX:NativeMemoryTracking=summary ByteBufferFragmentationExample
+clear; smem -c "pid command rss pss" -ak -P "ByteBufferFragmentationExample"
 jcmd `pgrep -f ByteBufferFragmentationExample` VM.native_memory scale=MB
-smem -c "pid command rss pss" -ak -P "ByteBufferFragmentationExample"
 ```
 
 ### Native invocation
 ```shell script
 java -Xms1G -Xmx1G -XX:+AlwaysPreTouch -XX:NativeMemoryTracking=summary Zip
-smem -c "pid command rss pss" -ak -P "Zip"
+clear; smem -c "pid command rss pss" -ak -P "Zip"
 jcmd  `pgrep -f Zip` VM.native_memory scale=MB
 ```
 
