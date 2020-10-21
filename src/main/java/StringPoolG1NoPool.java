@@ -3,9 +3,6 @@ import java.util.List;
 import java.util.Scanner;
 import org.apache.commons.lang3.RandomStringUtils;
 
-/**
- * -XX:NativeMemoryTracking=summary
- */
 class StringPoolG1NoPool {
     public static void main(String[] args) {
         new Thread(() -> {
