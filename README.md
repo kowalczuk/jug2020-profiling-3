@@ -19,7 +19,7 @@ jcmd `pgrep -f HelloWorld` GC.heap_info
 jcmd `pgrep -f HelloWorld` GC.run
 jcmd `pgrep -f HelloWorld` GC.class_histogram
 jcmd `pgrep -f HelloWorld` GC.heap_dump /tmp/dump.hprof
-grep "gc .*\-> " gc.log | sed "s/.*\[\(.*s\]\)/\1/" | sed "s/s\].*>/;/" | sed "s/M.*//" | sed "s/\./,/" > out.csv
+grep "gc .*\->" gc.log | sed "s/.*\[\(.*s\]\)/\1/" | sed "s/s\].*>/;/" | sed "s/M.*//" | sed "s/\./,/" > out.csv
 ```
 
 ### Class
